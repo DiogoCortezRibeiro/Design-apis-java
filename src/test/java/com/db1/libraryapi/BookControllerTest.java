@@ -5,6 +5,7 @@ import com.db1.libraryapi.dto.BookDTO;
 import com.db1.libraryapi.service.BookService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -51,7 +52,12 @@ public class BookControllerTest {
     }
 
     @Test
-    public void naoDeveCriarUmNovoLivroTest() {
+    public void naoDeveCriarUmNovoLivroTest() throws Exception {
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(BOOK_API).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(json);
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("erros", Matchers.hasSize(2)));
 
     }
 }
