@@ -62,12 +62,6 @@ public class BookController {
         bookService.deleteById(id);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleValidationExceptions(MethodArgumentNotValidException ex) {
-        return new ApiErrors(ex.getBindingResult());
-    }
-
     @GetMapping
     public Page<BookDTO> find(BookDTO dto, Pageable pageRequest) {
         Book filter = modelMapper.map(dto, Book.class);

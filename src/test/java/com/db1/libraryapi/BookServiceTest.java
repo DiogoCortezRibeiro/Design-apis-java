@@ -54,7 +54,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void deveLancarErroDeNegocioAoTentarSalvarLivroComTituloDuplicado() {
+    public void deveLancarErroDeNegocioAoTentarSalvarLivroComTituloDuplicadoTest() {
         // cenario
         Book book = Book.builder().title("Harry potter").author("Diogo").build();
         Mockito.when(bookRepository.existsByTitle(Mockito.anyString())).thenReturn(true);
@@ -70,7 +70,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void deveObterUmLivroPorId() {
+    public void deveObterUmLivroPorIdTest() {
         Long id = 1l;
         Book book = Book.builder().id(id).title("Harry potter").author("Diogo").build();
         Mockito.when(bookRepository.findById(id)).thenReturn(Optional.of(book));
@@ -144,5 +144,17 @@ public class BookServiceTest {
 
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent()).isEqualTo(Arrays.asList(book));
+    }
+
+    @Test
+    public void deveRetornarLivroPorAuthorTest() {
+        String author = "Diogo";
+        Mockito.when(bookRepository.findByAuthor(author)).thenReturn(Optional.of(Book.builder().id(1l).author(author).build()));
+
+        Optional<Book> book = service.getBookByAuthor(author);
+
+        assertThat(book.isPresent()).isTrue();
+        assertThat(book.get().getId()).isEqualTo(1l);
+        assertThat(book.get().getAuthor()).isEqualTo(author);
     }
 }

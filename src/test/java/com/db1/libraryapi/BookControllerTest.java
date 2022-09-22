@@ -1,5 +1,6 @@
 package com.db1.libraryapi;
 
+import com.db1.libraryapi.controller.BookController;
 import com.db1.libraryapi.domain.Book;
 import com.db1.libraryapi.dto.BookDTO;
 import com.db1.libraryapi.service.BookService;
@@ -32,7 +33,7 @@ import java.util.Optional;
 // spirng deve criar um mini contexto para rodar o test
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc
 public class BookControllerTest {
 

@@ -19,4 +19,6 @@ public interface BookService {
     void delete(Book book);
 
     Page<Book> find(Book book, Pageable page);
+
+    Optional<Book> getBookByAuthor(String author);
 }

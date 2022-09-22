@@ -60,4 +60,9 @@ public class BookServiceImpl implements BookService{
         Example<Book> example = Example.of(book, ExampleMatcher.matching().withIgnoreCase().withIgnoreNullValues().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
         return bookRepository.findAll(example, page);
     }
+
+    @Override
+    public Optional<Book> getBookByAuthor(String author) {
+        return bookRepository.findByAuthor(author);
+    }
 }
