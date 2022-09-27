@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -29,7 +30,6 @@ public class LoanServiceTest {
     @BeforeEach
     public void setUp() {
         this.loanService = new LoanImpl(loanRepository);
-
     }
 
     @Test
@@ -56,5 +56,32 @@ public class LoanServiceTest {
         Loan loan = loanService.save(saving);
 
         assertThat(loan.getId()).isEqualTo(savedLoan.getId());
+    }
+
+    @Test
+    public void deveRetornarUmLivroPorIdTest() {
+        // cenario
+        Book book = Book.builder().id(1l).author("Diogo").title("As incriveis historias do homem aranha").build();
+        Loan loan = Loan.builder().id(1l).book(book).customer("Diogo Cortez").loanDate(LocalDate.now()).build();
+
+        when(loanRepository.findById(1l)).thenReturn(Optional.of(loan));
+
+        // execução
+        Optional<Loan> result = loanService.getById(1l);
+
+        assertThat(result.isPresent()).isTrue();
+    }
+
+    @Test
+    public void deveAtualizarUmEmprestimoTest() {
+        Book book = Book.builder().id(1l).author("Diogo").title("As incriveis historias do homem aranha").build();
+        Loan loan = Loan.builder().id(1l).book(book).customer("Diogo Cortez").loanDate(LocalDate.now()).build();
+        loan.setReturned(true);
+
+        when(loanRepository.save(loan)).thenReturn(loan);
+
+        Loan updateLoan = loanService.update(loan);
+
+        assertThat(updateLoan.getReturned()).isTrue();
     }
 }

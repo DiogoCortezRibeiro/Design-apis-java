@@ -4,6 +4,7 @@ import com.db1.libraryapi.controller.LoanController;
 import com.db1.libraryapi.domain.Book;
 import com.db1.libraryapi.domain.Loan;
 import com.db1.libraryapi.dto.LoanDTO;
+import com.db1.libraryapi.dto.ReturnedLoanDTO;
 import com.db1.libraryapi.service.BookService;
 import com.db1.libraryapi.service.LoanService;
 import com.db1.libraryapi.utils.BusinessException;
@@ -28,6 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -50,7 +52,7 @@ public class LoanControllerTest {
     @Test
     public void deveRealizarUmEmprestimoTest() throws Exception{
         // cenario
-        LoanDTO dto = LoanDTO.builder().author("Diogo").customer("Diogo Cortez").build();
+        LoanDTO dto = LoanDTO.builder().author("Diogo").email("diogocortezr@gmail.com").customer("Diogo Cortez").build();
         String json = new ObjectMapper().writeValueAsString(dto);
 
         Book book = Book.builder().id(1l).author("Diogo").title("Harry potter").build();
@@ -80,5 +82,36 @@ public class LoanControllerTest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         mvc.perform(request).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void deveRetornarUmLivroTest() throws Exception {
+        // cenario{"returned: true}
+        ReturnedLoanDTO dto = ReturnedLoanDTO.builder().returned(true).build();
+
+        Loan loan = Loan.builder().id(1l).build();
+
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.of(loan));
+
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        mvc.perform(
+                patch(LOAN_API.concat("/" + 1)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(json)
+        ).andExpect(status().isOk());
+
+        Mockito.verify(loanService, Mockito.times(1)).update(loan);
+    }
+
+    @Test
+    public void naoDeveRetornarLivroEmprestadoTest() throws Exception{
+        ReturnedLoanDTO dto = ReturnedLoanDTO.builder().returned(true).build();
+
+        BDDMockito.given(loanService.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        mvc.perform(
+                patch(LOAN_API.concat("/" + 1)).accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content(json)
+        ).andExpect(status().isNotFound());
     }
 }
